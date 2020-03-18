@@ -1,0 +1,6 @@
+[submodule "nixpkgs-wayland"]
+	path = nixpkgs-wayland
+	url = https://github.com/colemickens/nixpkgs-wayland
+[submodule "nixpkgs-mozilla"]
+	path = nixpkgs-mozilla
+	url = https://github.com/mozilla/nixpkgs-mozilla.git
