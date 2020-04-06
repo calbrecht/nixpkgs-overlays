@@ -1,6 +1,6 @@
-self: super:
+self: pkgs:
 
-with super;
+with pkgs;
 
 {
   #ideaOracle = recurseIntoAttrs (
@@ -19,18 +19,10 @@ with super;
     ]);
     extraBinPathPackages = with self; [ nodejs yarn ];
     version = "2020.1";
-    #version = "2019.2.1";
-    #version = "2019.3";
-    build = "201.6251.26";
-    #build = "192.6262.47";
-    #build = "193.2956.42";
+    build = "201.6487.22";
     src = fetchurl {
-      #https://download.jetbrains.com/webide/PhpStorm-181.3986.12.tar.gz
-      #url = "https://download.jetbrains.com/webide/PhpStorm-${version}.tar.gz";
-      url = "https://download.jetbrains.com/webide/PhpStorm-${build}.tar.gz";
-      sha256 = "13fa6a51c0ae88cb0d21bb76bf9f6bc2bfc7a3600386307ea9ab0b4dab3ec298";
-      #sha256 = "08c2973d6b76e2be0917db2468af98e7ca5fb2b59c9d59e2c9f81df279eba6ad";
-      #sha256 = "cfd5fa1c8bbe87e91707b80fad407a6d6dfd48f6f69c69eee7413ab9ecdbbd70";
+      url = "https://download-cf.jetbrains.com/webide/PhpStorm-${build}.tar.gz";
+      sha256 = "82f34614778964bbe1721a09aef1e0394fd2ca5cdc1ab2674f6eca1bbfc31df0";
     };
   });
 
@@ -51,7 +43,6 @@ with super;
     version = "${build}";
     build = "183.4284.57";
     src = fetchurl {
-      # https://download.jetbrains.com/ruby/RubyMine-181.5281.41.tar.gz
       url = "https://download.jetbrains.com/ruby/${name}.tar.gz";
       sha256 = "aa6e6c3a9b9886766dffe9e2f57de7f0c893899b0066fc0b246c290af3670bcc";
 
@@ -72,11 +63,10 @@ with super;
   idea-community = jetbrains.idea-community.overrideDerivation (attrs: rec {
     name = "idea-community-${version}";
     version = "2020.1";
-    build = "201.6251.22";
+    build = "201.6487.11";
     src = fetchurl {
-      url = "https://download.jetbrains.com/idea/ideaIC-${build}.tar.gz";
-      sha256 = "544c512d84e36918f837fdc0eedd1f5f1e11ad754ab03ee63f3829e2964fd925";
-      #sha256 = "83ae01bfd4bcc4911213bd8c085a5503c36391f7c8093eb5099315d0ead95985";
+      url = "https://download-cf.jetbrains.com/idea/ideaIC-${build}.tar.gz";
+      sha256 = "494bea2cf9104113683213915304bf94917e020d3502bb64375d7d3b87de41f3";
     };
   });
 
