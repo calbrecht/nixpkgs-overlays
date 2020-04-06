@@ -1,13 +1,13 @@
-self: super:
+self: pkgs:
 
-with super; emacs26-nox.overrideAttrs (old: rec {
+with pkgs; emacs26-nox.overrideAttrs (old: rec {
   name = "emacs27-git-${date}";
-  date = "2019-09-22";
+  date = "2020-03-30";
 
   src = fetchgit {
     url = /home/alab/ws/emacs;
     branchName = "master";
-    sha256 = "0i08h9266zsn47p8vgzi9pf96kpds19rfkggc7kd7ybb6k475h79";
+    sha256 = "1wl8ac63yzrqm84qini80aa5cza42g0znsaiwm0wqsidmsidqlha";
   };
 
   nativeBuildInputs = old.nativeBuildInputs ++ (with self; [
