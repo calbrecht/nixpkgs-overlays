@@ -1,6 +1,6 @@
-self: super:
+self: pkgs:
 
-with super; pass.overrideAttrs (old: rec {
+with pkgs; pass.overrideAttrs (old: rec {
   src = fetchFromGitHub {
     repo = "password-store";
     owner = "zx2c4";

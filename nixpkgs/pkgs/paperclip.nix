@@ -12,11 +12,6 @@ rustPlatform.buildRustPackage rec {
     sha256 = "1510jjh76zf36k38py8d4rvs7rajm47v9affjnzd1vdanig55csz";
   };
 
-  //postPatch = ''
-  //  echo LLOOOOOOOOOOOOOOOOOOOOLLLL
-  //  make prepare
-  //'';
-
   cargoBuildFlags = [ "--features=cli" ];
   cargoSha256 = "0zqfvbihf8xwgh092n9wzm3mdgbv0n99gjsfk9przqj2vh7wfvh2";
 
