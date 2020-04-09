@@ -1,6 +1,10 @@
 [
   "eslint",
+  "import-js",
   "jsonlint",
+  "node-gyp",
+  "node-gyp-build",
+  "node-pre-gyp",
   "prettier",
   "standardx",
   "tslint",
