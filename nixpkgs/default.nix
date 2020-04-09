@@ -8,7 +8,17 @@ in with pkgs;
 
   paperclip-cli = callPackage ./pkgs/paperclip.nix {};
 
-  emacs27-git = import-overlay ./pkgs-overlays/emacs27-git.nix;
+  emacsNodePackages = { inherit (pkgs.callPackage ./nodePackages {})
+    eslint jsonlint prettier standardx tslint typescript;
+  };
+
+  emacs27-git = import ./pkgs-overlays/emacs27-git.nix self (pkgs // {
+    inherit (self) nodejs emacsNodePackages;
+  });
+
+  nodejs = pkgs.nodejs-13_x;
+
+  nodePackages = pkgs.nodePackages_13_x // self.emacsNodePackages;
 
   pass = import-overlay ./pkgs-overlays/pass.nix;
 

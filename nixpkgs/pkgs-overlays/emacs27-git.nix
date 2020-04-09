@@ -10,13 +10,13 @@ with pkgs; emacs26-nox.overrideAttrs (old: rec {
     sha256 = "1wl8ac63yzrqm84qini80aa5cza42g0znsaiwm0wqsidmsidqlha";
   };
 
-  nativeBuildInputs = old.nativeBuildInputs ++ (with self; [
-    git autoconf automake
-  ]);
+  nativeBuildInputs = old.nativeBuildInputs ++ [
+    git autoconf automake makeWrapper
+  ];
 
-  #propagatedNativeBuildInputs = old.propagatedNativeBuildInputs ++ [
-  #  nodejs (import /home/alab/ws/import-js {}).package
-  #];
+  propagatedNativeBuildInputs = (old.propagatedNativeBuildInputs or []) ++ [
+    nodejs
+  ] ++ pkgs.lib.attrValues pkgs.emacsNodePackages;
 
   patches = [];
 
@@ -39,5 +39,11 @@ with pkgs; emacs26-nox.overrideAttrs (old: rec {
   '';
 
   preInstall = ''
+  '';
+
+  postInstall = (old.postInstall or "") + ''
+      wrapProgram $out/bin/emacs \
+        --prefix PATH ":" "${pkgs.stdenv.lib.makeBinPath
+          ([ nodejs ] ++ pkgs.lib.attrValues pkgs.emacsNodePackages)}"
   '';
 })
