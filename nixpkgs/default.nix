@@ -4,6 +4,12 @@ let
   import-overlay = path: import path self pkgs;
 in with pkgs;
 {
+  alsaLib = pkgs.alsaLib.overrideAttrs (old: {
+    patches = old.patches ++ [
+      ./pkgs-overlays/alsa-lib/environment-plugin-dir.patch
+    ];
+  });
+
   global-cursor-theme = callPackage ./pkgs/global-cursor-theme.nix {};
 
   paperclip-cli = callPackage ./pkgs/paperclip.nix {};
