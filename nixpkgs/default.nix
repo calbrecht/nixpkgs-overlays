@@ -38,7 +38,7 @@ in with pkgs;
 
   xdg-desktop-portal = import-overlay ./pkgs-overlays/xdg-desktop-portal.nix;
 
-  xdg-desktop-portal-wlr = pkgs.callPackage ./pkgs/xdg-desktop-portal-wlr.nix {
+  xdg-desktop-portal-wlr = pkgs.waylandPkgs.xdg-desktop-portal-wlr.override {
       pipewire = self.pipewire_0_3;
   };
 
