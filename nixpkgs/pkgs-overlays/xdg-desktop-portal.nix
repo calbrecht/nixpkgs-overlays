@@ -1,14 +1,14 @@
 self: pkgs:
 
 (pkgs.xdg-desktop-portal.override {
-  pipewire = self.pipewire_0_3;
+  pipewire_0_2 = pkgs.pipewire;
 }).overrideAttrs (old: rec {
-  version = "1.7.1";
+  version = "1.7.2";
 
   src = pkgs.fetchFromGitHub {
     owner = "flatpak";
     repo = old.pname;
     rev = version;
-    sha256 = "0qb8hys4dfr3sg22rbqvvwy1digrybg223cs0v7dq7w19yzvzmll";
+    sha256 = "0rkwpsmbn3d3spkzc2zsd50l2r8pp4la390zcpsawaav8w7ql7xm";
   };
 })
