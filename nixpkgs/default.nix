@@ -40,7 +40,7 @@ in with pkgs;
     gdkWayland = true;
   };
 
-  pipewire_0_3 = import-overlay ./pkgs-overlays/pipewire.nix;
+  pipewire = import-overlay ./pkgs-overlays/pipewire.nix;
 
   xdg-desktop-portal = import-overlay ./pkgs-overlays/xdg-desktop-portal.nix;
 
