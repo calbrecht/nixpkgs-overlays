@@ -27,13 +27,9 @@ in with pkgs;
 
   xdg-desktop-portal = import-overlay ./pkgs-overlays/xdg-desktop-portal.nix;
 
-  xdg-desktop-portal-wlr = pkgs.waylandPkgs.xdg-desktop-portal-wlr.override {
-      pipewire = self.pipewire_0_3;
-  };
-
 } // {
   waylandPkgs = (pkgs.waylandPkgs or {}) // {
-    inherit (self) mako xdg-desktop-portal-wlr waybar;
+    inherit (self) mako waybar;
   };
 } //
 (import-overlay ./pkgs-overlays/jetbrains.nix)
