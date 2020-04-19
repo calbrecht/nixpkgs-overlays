@@ -10,6 +10,22 @@ in with pkgs;
     ];
   });
 
+  gtk3_24_18 = pkgs.gtk3.overrideAttrs (old: rec {
+    version = "3.24.18";
+    src = fetchurl {
+      url = "mirror://gnome/sources/gtk+/${stdenv.lib.versions.majorMinor version}/gtk+-${version}.tar.xz";
+      sha256 = "1lia2ybd1661j6mvrc00iyd50gm7sy157bdzlyf4mr028rzzzspm";
+    };
+  });
+
+  gtkmm3_24_18 = pkgs.gtkmm3.override {
+    gtk3 = self.gtk3_24_18;
+  };
+
+  waybar = pkgs.waybar.override {
+    gtkmm3 = self.gtkmm3_24_18;
+  };
+
   global-cursor-theme = callPackage ./pkgs/global-cursor-theme.nix {};
 
   paperclip-cli = callPackage ./pkgs/paperclip.nix {};
