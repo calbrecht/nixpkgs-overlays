@@ -8,5 +8,6 @@
   "prettier",
   "standardx",
   "tslint",
-  "typescript"
+  "typescript",
+  "testcafe-browser-tools"
 ]
