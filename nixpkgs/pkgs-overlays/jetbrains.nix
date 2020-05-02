@@ -19,10 +19,10 @@ with pkgs;
     ]);
     extraBinPathPackages = with self; [ nodejs yarn ];
     version = "2020.1";
-    build = "201.6487.22";
+    build = "201.6668.30";
     src = fetchurl {
       url = "https://download-cf.jetbrains.com/webide/PhpStorm-${build}.tar.gz";
-      sha256 = "82f34614778964bbe1721a09aef1e0394fd2ca5cdc1ab2674f6eca1bbfc31df0";
+      sha256 = "364b1b729c65bd10ca56875525ce615d7d39c52a93e1b2375a19b0a8a20a7bdb";
     };
   });
 
