@@ -14,18 +14,26 @@ in with pkgs;
 
   paperclip-cli = callPackage ./pkgs/paperclip.nix {};
 
-  emacsNodePackages = { inherit (pkgs.callPackage ./nodePackages
-    ({ inherit pkgs; } // { pkgs = self; }))
+  emacsNodePackages = { inherit (self.nodePackages)
     eslint import-js jsonlint prettier standardx tslint typescript;
   };
 
-  emacs27-git = import ./pkgs-overlays/emacs27-git.nix self (pkgs // {
+  emacs27-git-solo = import ./pkgs-overlays/emacs27-git.nix self (pkgs // {
     inherit (self) nodejs emacsNodePackages;
   });
 
+  emacs27-git = ((pkgs.emacsPackagesGen self.emacs27-git-solo).emacsWithPackages)
+    (epkgs: (with epkgs.melpaStablePackages; [
+    ]) ++ (with epkgs.melpaPackages; [
+      vterm
+    ]) ++ (with epkgs.elpaPackages; [
+    ]) ++ [
+    ]);
+
   nodejs = pkgs.nodejs-13_x;
 
-  nodePackages = pkgs.nodePackages_13_x // self.emacsNodePackages;
+  nodePackages = pkgs.nodePackages_13_x // (pkgs.callPackage ./nodePackages
+                                            ({ inherit pkgs; } // { pkgs = self; }));
 
   pass = import-overlay ./pkgs-overlays/pass.nix;
 
