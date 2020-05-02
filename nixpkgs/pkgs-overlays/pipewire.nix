@@ -7,12 +7,14 @@ pkgs.pipewire.overrideAttrs (old: rec {
     domain = "gitlab.freedesktop.org";
     owner = "pipewire";
     repo = "pipewire";
-    rev = "dfd1adf816dfee75ebec94f2de386fc73ececb02";
-    sha256 = "1garm8bv0jjknwyivr63xsmw8s3jfgf6j6ky1w5fn0010zjqviif";
+    rev = "7f271ef982bd3c93c39d018e4c8c45052c5e70a5";
+    sha256 = "1xyd6p43cj9jl0bqzn06myn6lsm8qwrz0hfy3szmrxl1197v5fnn";
   };
 
   buildInputs = old.buildInputs ++ (with self; [
   ]);
+
+  patches = [];
 
   mesonFlags = [
     "-Ddocs=true"
