@@ -18,7 +18,7 @@ in with pkgs;
     eslint import-js jsonlint prettier standardx tslint typescript;
   };
 
-  emacs27-git-solo = import ./pkgs-overlays/emacs27-git.nix self (pkgs // {
+  emacs27-git-solo = import ./pkgs-overlays/emacs27-git self (pkgs // {
     inherit (self) nodejs emacsNodePackages;
   });
 
@@ -37,24 +37,24 @@ in with pkgs;
 
   pass = import-overlay ./pkgs-overlays/pass.nix;
 
-  xdg-desktop-portal-gtk = import-overlay ./pkgs-overlays/xdg-desktop-portal-gtk.nix;
+  xdg-desktop-portal-gtk = import-overlay ./pkgs-overlays/xdg-desktop-portal-gtk;
 
 } // {
   # screensharing
 
-  firefox-wayland-pipewire-unwrapped = import-overlay ./pkgs-overlays/firefox.nix;
+  firefox-wayland-pipewire-unwrapped = import-overlay ./pkgs-overlays/firefox;
 
   firefox-wayland-pipewire = wrapFirefox self.firefox-wayland-pipewire-unwrapped {
     gdkWayland = true;
   };
 
-  pipewire = import-overlay ./pkgs-overlays/pipewire.nix;
+  pipewire = import-overlay ./pkgs-overlays/pipewire;
 
-  xdg-desktop-portal = import-overlay ./pkgs-overlays/xdg-desktop-portal.nix;
+  xdg-desktop-portal = import-overlay ./pkgs-overlays/xdg-desktop-portal;
 
 } // {
   waylandPkgs = (pkgs.waylandPkgs or {}) // {
     inherit (self) mako waybar;
   };
 } //
-(import-overlay ./pkgs-overlays/jetbrains.nix)
+(import-overlay ./pkgs-overlays/jetbrains)
