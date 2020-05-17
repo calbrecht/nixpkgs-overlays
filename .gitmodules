@@ -4,3 +4,12 @@
 [submodule "nixpkgs-mozilla"]
 	path = nixpkgs-mozilla
 	url = https://github.com/mozilla/nixpkgs-mozilla.git
+[submodule "nixpkgs/pkgs-overlays/nixops/nixops-libvirtd"]
+	path = nixpkgs/pkgs-overlays/nixops/nixops-libvirtd
+	url = https://github.com/nix-community/nixops-libvirtd.git
+[submodule "nixpkgs/pkgs-overlays/nixops/nixops"]
+	path = nixpkgs/pkgs-overlays/nixops/nixops
+	url = https://github.com/NixOS/nixops.git
+[submodule "nixpkgs/pkgs-overlays/nixops/nixops-hetzner"]
+	path = nixpkgs/pkgs-overlays/nixops/nixops-hetzner
+	url = https://github.com/NixOS/nixops-hetzner.git
