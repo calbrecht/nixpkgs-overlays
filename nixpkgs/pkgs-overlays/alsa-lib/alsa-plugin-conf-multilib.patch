@@ -1,0 +1,386 @@
+diff --git a/src/control/control.c b/src/control/control.c
+index 33650155..372bd8e4 100644
+--- a/src/control/control.c
++++ b/src/control/control.c
+@@ -1259,6 +1259,10 @@ static int snd_ctl_open_conf(snd_ctl_t **ctlp, const char *name,
+ #ifndef PIC
+ 	extern void *snd_control_open_symbols(void);
+ #endif
++
++	snd_config_t *libs = NULL;
++	const char *libs_lib = NULL;
++
+ 	if (snd_config_get_type(ctl_conf) != SND_CONFIG_TYPE_COMPOUND) {
+ 		if (name)
+ 			SNDERR("Invalid type for CTL %s definition", name);
+@@ -1301,6 +1305,19 @@ static int snd_ctl_open_conf(snd_ctl_t **ctlp, const char *name,
+ 					SNDERR("Invalid type for %s", id);
+ 					goto _err;
+ 				}
++
++				continue;
++			}
++			// Handle an array of extra libs.
++			if (strcmp(id, "libs") == 0) {
++				if (snd_config_get_type(n) != SND_CONFIG_TYPE_COMPOUND) {
++					SNDERR("Invalid type for libs definition in CTL %s definition",
++						str);
++					goto _err;
++				}
++
++				libs = n;
++
+ 				continue;
+ 			}
+ 			if (strcmp(id, "open") == 0) {
+@@ -1325,7 +1342,62 @@ static int snd_ctl_open_conf(snd_ctl_t **ctlp, const char *name,
+ 		open_name = buf;
+ 		sprintf(buf, "_snd_ctl_%s_open", str);
+ 	}
+-	if (!lib) {
++
++#ifndef PIC
++	snd_control_open_symbols();
++#endif
++
++	// Normal alsa behaviour when there is no libs array.
++	if (!libs) {
++		if (lib) {
++			open_func = snd_dlobj_cache_get(lib, open_name,
++				SND_DLSYM_VERSION(SND_CONTROL_DLSYM_VERSION), 1);
++		}
++	}
++	// Handle libs array.
++	// Suppresses error messages if any function is loaded successfully.
++	else {
++		if (lib) {
++			open_func = snd_dlobj_cache_get(lib, open_name,
++				SND_DLSYM_VERSION(SND_CONTROL_DLSYM_VERSION), 0);
++		}
++
++		if (!open_func) {
++			snd_config_for_each(i, next, libs) {
++				snd_config_t *n = snd_config_iterator_entry(i);
++
++				err = snd_config_get_string(n, &libs_lib);
++				if (err < 0) {
++					SNDERR("Invalid entry in CTL %s libs definition", str);
++					goto _err;
++				}
++
++				if (!open_func) {
++					open_func = snd_dlobj_cache_get(libs_lib, open_name,
++						SND_DLSYM_VERSION(SND_CONTROL_DLSYM_VERSION), 0);
++				}
++			}
++		}
++
++		// Print error messages.
++		if (!open_func) {
++			if (lib) {
++				SNDERR("Either %s cannot be opened or %s was not defined inside",
++					lib, open_name);
++			}
++
++			snd_config_for_each(i, next, libs) {
++				snd_config_t *n = snd_config_iterator_entry(i);
++
++				snd_config_get_string(n, &libs_lib);
++				SNDERR("Either %s cannot be opened or %s was not defined inside",
++					libs_lib, open_name);
++			}
++		}
++	}
++
++	// Look in ALSA_PLUGIN_DIR iff we found nowhere else to look.
++	if (!lib && (!libs || !libs_lib)) {
+ 		const char *const *build_in = build_in_ctls;
+ 		while (*build_in) {
+ 			if (!strcmp(*build_in, str))
+@@ -1341,12 +1413,11 @@ static int snd_ctl_open_conf(snd_ctl_t **ctlp, const char *name,
+ 			lib = buf1;
+ 			sprintf(buf1, "%s/libasound_module_ctl_%s.so", ALSA_PLUGIN_DIR, str);
+ 		}
+-	}
+-#ifndef PIC
+-	snd_control_open_symbols();
+-#endif
+-	open_func = snd_dlobj_cache_get(lib, open_name,
++
++		open_func = snd_dlobj_cache_get(lib, open_name,
+ 			SND_DLSYM_VERSION(SND_CONTROL_DLSYM_VERSION), 1);
++	}
++
+ 	if (open_func) {
+ 		err = open_func(ctlp, name, ctl_root, ctl_conf, mode);
+ 		if (err >= 0) {
+diff --git a/src/pcm/pcm.c b/src/pcm/pcm.c
+index 3a71d79b..56d701b3 100644
+--- a/src/pcm/pcm.c
++++ b/src/pcm/pcm.c
+@@ -2418,6 +2418,10 @@ static int snd_pcm_open_conf(snd_pcm_t **pcmp, const char *name,
+ #ifndef PIC
+ 	extern void *snd_pcm_open_symbols(void);
+ #endif
++
++	snd_config_t *libs = NULL;
++	const char *libs_lib = NULL;
++
+ 	if (snd_config_get_type(pcm_conf) != SND_CONFIG_TYPE_COMPOUND) {
+ 		char *val;
+ 		id = NULL;
+@@ -2463,6 +2467,19 @@ static int snd_pcm_open_conf(snd_pcm_t **pcmp, const char *name,
+ 					SNDERR("Invalid type for %s", id);
+ 					goto _err;
+ 				}
++
++				continue;
++			}
++			// Handle an array of extra libs.
++			if (strcmp(id, "libs") == 0) {
++				if (snd_config_get_type(n) != SND_CONFIG_TYPE_COMPOUND) {
++					SNDERR("Invalid type for libs definition in PCM %s definition",
++						str);
++					goto _err;
++				}
++
++				libs = n;
++
+ 				continue;
+ 			}
+ 			if (strcmp(id, "open") == 0) {
+@@ -2487,7 +2504,62 @@ static int snd_pcm_open_conf(snd_pcm_t **pcmp, const char *name,
+ 		open_name = buf;
+ 		sprintf(buf, "_snd_pcm_%s_open", str);
+ 	}
+-	if (!lib) {
++
++#ifndef PIC
++	snd_pcm_open_symbols();	/* this call is for static linking only */
++#endif
++
++	// Normal alsa behaviour when there is no libs array.
++	if (!libs) {
++		if (lib) {
++			open_func = snd_dlobj_cache_get(lib, open_name,
++				SND_DLSYM_VERSION(SND_PCM_DLSYM_VERSION), 1);
++		}
++	}
++	// Handle libs array.
++	// Suppresses error messages if any function is loaded successfully.
++	else {
++		if (lib) {
++			open_func = snd_dlobj_cache_get(lib, open_name,
++				SND_DLSYM_VERSION(SND_PCM_DLSYM_VERSION), 0);
++		}
++
++		if (!open_func) {
++			snd_config_for_each(i, next, libs) {
++				snd_config_t *n = snd_config_iterator_entry(i);
++
++				err = snd_config_get_string(n, &libs_lib);
++				if (err < 0) {
++					SNDERR("Invalid entry in PCM %s libs definition", str);
++					goto _err;
++				}
++
++				if (!open_func) {
++					open_func = snd_dlobj_cache_get(libs_lib, open_name,
++						SND_DLSYM_VERSION(SND_PCM_DLSYM_VERSION), 0);
++				}
++			}
++		}
++
++		// Print error messages.
++		if (!open_func) {
++			if (lib) {
++				SNDERR("Either %s cannot be opened or %s was not defined inside",
++					lib, open_name);
++			}
++
++			snd_config_for_each(i, next, libs) {
++				snd_config_t *n = snd_config_iterator_entry(i);
++
++				snd_config_get_string(n, &libs_lib);
++				SNDERR("Either %s cannot be opened or %s was not defined inside",
++					libs_lib, open_name);
++			}
++		}
++	}
++
++	// Look in ALSA_PLUGIN_DIR iff we found nowhere else to look.
++	if (!lib && (!libs || !libs_lib)) {
+ 		const char *const *build_in = build_in_pcms;
+ 		while (*build_in) {
+ 			if (!strcmp(*build_in, str))
+@@ -2503,12 +2575,11 @@ static int snd_pcm_open_conf(snd_pcm_t **pcmp, const char *name,
+ 			lib = buf1;
+ 			sprintf(buf1, "%s/libasound_module_pcm_%s.so", ALSA_PLUGIN_DIR, str);
+ 		}
+-	}
+-#ifndef PIC
+-	snd_pcm_open_symbols();	/* this call is for static linking only */
+-#endif
+-	open_func = snd_dlobj_cache_get(lib, open_name,
++
++		open_func = snd_dlobj_cache_get(lib, open_name,
+ 			SND_DLSYM_VERSION(SND_PCM_DLSYM_VERSION), 1);
++	}
++
+ 	if (open_func) {
+ 		err = open_func(pcmp, name, pcm_root, pcm_conf, stream, mode);
+ 		if (err >= 0) {
+diff --git a/src/pcm/pcm_rate.c b/src/pcm/pcm_rate.c
+index 5dc8a927..0f822bf9 100644
+--- a/src/pcm/pcm_rate.c
++++ b/src/pcm/pcm_rate.c
+@@ -1261,15 +1261,17 @@ static const char *const default_rate_plugins[] = {
+ 	"speexrate", "linear", NULL
+ };
+ 
+-static int rate_open_func(snd_pcm_rate_t *rate, const char *type, const snd_config_t *converter_conf, int verbose)
++static int rate_open_func(snd_pcm_rate_t *rate, const char *type, const snd_config_t *converter_conf, int verbose, snd_config_t *libs)
+ {
+ 	char open_name[64], open_conf_name[64], lib_name[128], *lib = NULL;
++	const char *libs_lib = NULL;
+ 	snd_pcm_rate_open_func_t open_func;
+ 	snd_pcm_rate_open_conf_func_t open_conf_func;
+ 	int err;
+ 
+ 	snprintf(open_name, sizeof(open_name), "_snd_pcm_rate_%s_open", type);
+ 	snprintf(open_conf_name, sizeof(open_conf_name), "_snd_pcm_rate_%s_open_conf", type);
++
+ 	if (!is_builtin_plugin(type)) {
+ 		snprintf(lib_name, sizeof(lib_name),
+ 				 "%s/libasound_module_rate_%s.so", ALSA_PLUGIN_DIR, type);
+@@ -1280,7 +1282,10 @@ static int rate_open_func(snd_pcm_rate_t *rate, const char *type, const snd_conf
+ 	rate->rate_max = SND_PCM_PLUGIN_RATE_MAX;
+ 	rate->plugin_version = SND_PCM_RATE_PLUGIN_VERSION;
+ 
+-	open_conf_func = snd_dlobj_cache_get(lib, open_conf_name, NULL, verbose && converter_conf != NULL);
++	if (!libs) {
++		open_conf_func = snd_dlobj_cache_get(lib, open_conf_name, NULL, verbose && converter_conf != NULL);
++	}
++
+ 	if (open_conf_func) {
+ 		err = open_conf_func(SND_PCM_RATE_PLUGIN_VERSION,
+ 				     &rate->obj, &rate->ops, converter_conf);
+@@ -1298,10 +1303,43 @@ static int rate_open_func(snd_pcm_rate_t *rate, const char *type, const snd_conf
+ 		}
+ 	}
+ 
+-	open_func = snd_dlobj_cache_get(lib, open_name, NULL, verbose);
+-	if (!open_func)
++	if (!libs) {
++		open_func = snd_dlobj_cache_get(lib, open_name, NULL, verbose);
++	} else {
++		snd_config_iterator_t i, next;
++		snd_config_for_each(i, next, libs) {
++			snd_config_t *n = snd_config_iterator_entry(i);
++
++			err = snd_config_get_string(n, &libs_lib);
++			if (err < 0) {
++				SNDERR("Invalid entry in PCM %s libs definition",
++				       converter_conf);
++				break;
++			}
++
++			if (!open_func) {
++				open_func = snd_dlobj_cache_get(libs_lib, open_name,
++					NULL, verbose);
++			}
++		}
++	}
++
++	if (!open_func && !libs)
+ 		return -ENOENT;
+ 
++	else if (!open_func) {
++		// Print error messages.
++		snd_config_iterator_t i, next;
++		snd_config_for_each(i, next, libs) {
++			snd_config_t *n = snd_config_iterator_entry(i);
++
++			snd_config_get_string(n, &libs_lib);
++			SNDERR("Either %s cannot be opened or %s was not defined inside",
++				libs_lib, open_name);
++		}
++		return -ENOENT;
++	}
++
+ 	rate->open_func = open_func;
+ 
+ 	err = open_func(SND_PCM_RATE_PLUGIN_VERSION, &rate->obj, &rate->ops);
+@@ -1379,6 +1417,8 @@ int snd_pcm_rate_open(snd_pcm_t **pcmp, const char *name,
+ 	extern int SND_PCM_RATE_PLUGIN_ENTRY(linear) (unsigned int version, void **objp, snd_pcm_rate_ops_t *ops);
+ #endif
+ 
++	snd_config_t *libs = NULL;
++
+ 	assert(pcmp && slave);
+ 	if (sformat != SND_PCM_FORMAT_UNKNOWN &&
+ 	    snd_pcm_format_linear(sformat) != 1)
+@@ -1403,21 +1443,21 @@ int snd_pcm_rate_open(snd_pcm_t **pcmp, const char *name,
+ 	if (!converter) {
+ 		const char *const *types;
+ 		for (types = default_rate_plugins; *types; types++) {
+-			err = rate_open_func(rate, *types, NULL, 0);
++			err = rate_open_func(rate, *types, NULL, 0, NULL);
+ 			if (!err) {
+ 				type = *types;
+ 				break;
+ 			}
+ 		}
+ 	} else if (!snd_config_get_string(converter, &type))
+-		err = rate_open_func(rate, type, NULL, 1);
++		err = rate_open_func(rate, type, NULL, 1, NULL);
+ 	else if (is_string_array(converter)) {
+ 		snd_config_iterator_t i, next;
+ 		snd_config_for_each(i, next, converter) {
+ 			snd_config_t *n = snd_config_iterator_entry(i);
+ 			if (snd_config_get_string(n, &type) < 0)
+ 				break;
+-			err = rate_open_func(rate, type, NULL, 0);
++			err = rate_open_func(rate, type, NULL, 0, NULL);
+ 			if (!err)
+ 				break;
+ 		}
+@@ -1428,9 +1468,24 @@ int snd_pcm_rate_open(snd_pcm_t **pcmp, const char *name,
+ 			const char *id;
+ 			if (snd_config_get_id(n, &id) < 0)
+ 				continue;
+-			if (strcmp(id, "name") != 0)
++			if (strcmp(id, "name") == 0) {
++				err = snd_config_get_string(n, &type);
++				if (err < 0)
++					break;
++
+ 				continue;
+-			snd_config_get_string(n, &type);
++			}
++			// Handle an array of extra libs.
++			if (strcmp(id, "libs") == 0) {
++				if (snd_config_get_type(n) != SND_CONFIG_TYPE_COMPOUND) {
++					SNDERR("Invalid type for libs definition in rate converter definition");
++					break;
++				}
++
++				libs = n;
++
++				continue;
++			}
+ 			break;
+ 		}
+ 		if (!type) {
+@@ -1439,7 +1494,10 @@ int snd_pcm_rate_open(snd_pcm_t **pcmp, const char *name,
+ 			free(rate);
+ 			return -EINVAL;
+ 		}
+-		err = rate_open_func(rate, type, converter, 1);
++		if (!libs)
++			err = rate_open_func(rate, type, converter, 1, NULL);
++		else
++			err = rate_open_func(rate, type, converter, 1, libs);
+ 	} else {
+ 		SNDERR("Invalid type for rate converter");
+ 		snd_pcm_free(pcm);

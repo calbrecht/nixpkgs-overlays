@@ -4,9 +4,11 @@ let
   import-overlay = path: import path self pkgs;
 in with pkgs;
 {
-  alsaLib = pkgs.alsaLib.overrideAttrs (old: {
-    patches = old.patches ++ [
-      ./pkgs-overlays/alsa-lib/environment-plugin-dir.patch
+  alsaLib-patched = pkgs.alsaLib.overrideAttrs (old: {
+     #patches = old.patches ++ [
+     #  ./pkgs-overlays/alsa-lib/environment-plugin-dir.patch
+     patches = [
+       ./pkgs-overlays/alsa-lib/alsa-plugin-conf-multilib.patch
     ];
   });
 
