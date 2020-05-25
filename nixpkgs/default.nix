@@ -55,7 +55,7 @@ in with pkgs;
   nodePackages = pkgs.nodePackages_13_x // (pkgs.callPackage ./nodePackages
                                             ({ inherit pkgs; } // { pkgs = self; }));
 
-  pass = import-overlay ./pkgs-overlays/pass.nix;
+  pass = import-overlay ./pkgs-overlays/pass;
 
   xdg-desktop-portal-gtk = import-overlay ./pkgs-overlays/xdg-desktop-portal-gtk;
 
