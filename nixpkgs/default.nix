@@ -14,20 +14,38 @@ in with pkgs;
 
   global-cursor-theme = callPackage ./pkgs/global-cursor-theme.nix {};
 
+  rnix-lsp = callPackage (fetchFromGitHub {
+    owner = "nix-community";
+    repo = "rnix-lsp";
+    rev = "731f47c10c632452450071c925e236cecf458c2e";
+    sha256 = "1maki4snq766gpcykzhirsw5zyy5aipzn10fj0pmb86ldjx9cim9";
+  }) {};
+
+  rustNightly = (rustChannelOf { date = "2020-04-22"; channel = "nightly"; });
+
   paperclip-cli = callPackage ./pkgs/paperclip.nix {};
 
   emacsNodePackages = { inherit (self.nodePackages)
     eslint import-js jsonlint prettier standardx tslint typescript;
   };
 
-  emacs27-git-solo = import ./pkgs-overlays/emacs27-git self (pkgs // {
-    inherit (self) nodejs emacsNodePackages;
+  emacsExtraPathPackages = with self; [
+    crate2nix
+    rnix-lsp nixpkgs-fmt fd
+    stdenv.cc.bintools.bintools_bin diffutils
+    llvmPackages.libclang llvmPackages.clang llvmPackages.bintools
+    pkg-config
+  ];
+
+  emacs28-git-solo = import ./pkgs-overlays/emacs28-git self (pkgs // {
+    inherit (self) nodejs emacsNodePackages emacsExtraPathPackages;
   });
 
-  emacs27-git = ((pkgs.emacsPackagesGen self.emacs27-git-solo).emacsWithPackages)
+  emacs28-git = ((pkgs.emacsPackagesGen self.emacs28-git-solo).emacsWithPackages)
     (epkgs: (with epkgs.melpaStablePackages; [
     ]) ++ (with epkgs.melpaPackages; [
       vterm
+      nix-mode #nixos-options nixpkgs-fmt # TODO build refresh procedure
     ]) ++ (with epkgs.elpaPackages; [
     ]) ++ [
     ]);

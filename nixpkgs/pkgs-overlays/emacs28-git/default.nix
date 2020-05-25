@@ -1,22 +1,18 @@
 self: pkgs:
 
 with pkgs; emacs26-nox.overrideAttrs (old: rec {
-  name = "emacs27-git-${date}";
-  date = "2020-03-30";
+  name = "emacs28-git-${date}";
+  date = "2020-05-09";
 
   src = fetchgit {
-    url = /home/alab/ws/emacs;
+    url = ./emacs;
     branchName = "master";
-    sha256 = "1wl8ac63yzrqm84qini80aa5cza42g0znsaiwm0wqsidmsidqlha";
+    sha256 = "1532h2d3msbfaamjlzabisjgzvvqcyifwzqj7hqvswdfvlbysyf1";
   };
 
   nativeBuildInputs = old.nativeBuildInputs ++ [
     git autoconf automake makeWrapper
   ];
-
-  propagatedNativeBuildInputs = (old.propagatedNativeBuildInputs or []) ++ [
-    nodejs
-  ] ++ pkgs.lib.attrValues pkgs.emacsNodePackages;
 
   patches = [];
 
@@ -44,6 +40,6 @@ with pkgs; emacs26-nox.overrideAttrs (old: rec {
   postInstall = (old.postInstall or "") + ''
       wrapProgram $out/bin/emacs \
         --prefix PATH ":" "${pkgs.stdenv.lib.makeBinPath
-          ([ nodejs ] ++ pkgs.lib.attrValues pkgs.emacsNodePackages)}"
+          ([ nodejs ] ++ pkgs.lib.attrValues pkgs.emacsNodePackages ++ pkgs.emacsExtraPathPackages)}"
   '';
 })
