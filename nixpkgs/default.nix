@@ -74,7 +74,6 @@ in with pkgs;
 
 } // {
   waylandPkgs = (pkgs.waylandPkgs or {}) // {
-    inherit (self) mako waybar;
   };
 } //
 (import-overlay ./pkgs-overlays/jetbrains)
