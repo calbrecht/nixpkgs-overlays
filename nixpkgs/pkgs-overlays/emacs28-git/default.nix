@@ -4,11 +4,7 @@ with pkgs; emacs26-nox.overrideAttrs (old: rec {
   name = "emacs28-git-${date}";
   date = "2020-05-09";
 
-  src = fetchgit {
-    url = ./emacs;
-    branchName = "master";
-    sha256 = "0cg4gsb5kmzl2dq2fg60nd93s8vk8k0b1rb27xd45xx29wl5i6cz";
-  };
+  src = ./emacs;
 
   nativeBuildInputs = old.nativeBuildInputs ++ [
     git autoconf automake makeWrapper
