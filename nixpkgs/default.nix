@@ -25,7 +25,7 @@ in with pkgs;
 
   paperclip-cli = callPackage ./pkgs/paperclip.nix {};
 
-  emacsNodePackages = { inherit (self.nodePackages)
+  emacsNodePackages = { inherit (self.current-nodePackages)
     eslint import-js jsonlint prettier standardx tslint typescript;
   };
 
@@ -38,7 +38,7 @@ in with pkgs;
   ];
 
   emacs28-git-solo = import ./pkgs-overlays/emacs28-git self (pkgs // {
-    inherit (self) nodejs emacsNodePackages emacsExtraPathPackages;
+    inherit (self) current-nodejs emacsNodePackages emacsExtraPathPackages;
   });
 
   emacs28-git = ((pkgs.emacsPackagesGen self.emacs28-git-solo).emacsWithPackages)
@@ -50,9 +50,9 @@ in with pkgs;
     ]) ++ [
     ]);
 
-  nodejs = pkgs.nodejs-13_x;
+  current-nodejs = pkgs.nodejs_latest;
 
-  nodePackages = pkgs.nodePackages_13_x // (pkgs.callPackage ./nodePackages
+  current-nodePackages = pkgs.nodePackages_latest // (pkgs.callPackage ./nodePackages
                                             ({ inherit pkgs; } // { pkgs = self; }));
 
   pass = import-overlay ./pkgs-overlays/pass;
