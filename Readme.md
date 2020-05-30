@@ -14,19 +14,18 @@ in your /etc/configuration.nix
     
   services.pipewire.enable = false;
  
-  services.xdg = {
+  xdg = {
     icons.enable = true;
-        portal = {
-            enable = true;
-            extraPortals = [
-                pkgs.xdg-desktop-portal-gtk
-                pkgs.xdg-desktop-portal-wlr
-            ];
-            gtkUsePortal = true;
-        };
+    portal = {
+      enable = true;
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gtk
+        pkgs.xdg-desktop-portal-wlr
+      ];
+      gtkUsePortal = true;
     };
   };
-    
+
   systemd = {
     user.services.pipewire = {
       enable = true;
