@@ -7,8 +7,8 @@ pkgs.firefoxPackages.firefox.overrideAttrs (old: rec {
 
   patches = old.patches ++ [
     ((pkgs.fetchpatch {
-      url = "https://src.fedoraproject.org/rpms/firefox/blob/9ab78f69bc21c3ee0cafc017e3ad3f7779e4006e/f/firefox-pipewire-0-3.patch";
-      sha256 = "0h02365ybwfkrs55b1a701mf2qb617zkc9lmbid6w2f6w996rfz3";
+      url = "https://src.fedoraproject.org/rpms/firefox/raw/9ab78f69bc21c3ee0cafc017e3ad3f7779e4006e/f/firefox-pipewire-0-3.patch";
+      sha256 = "18lnsrrcpdpvimnlrjqxgql3d3zp91kgmvwdxqrc2wv2j3gs3yz2";
     }))
   ];
 
