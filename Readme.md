@@ -1,6 +1,6 @@
 Firefox screensharing on sway and NixOs master
 
-You need the [overlays](https://github.com/calbrecht/nixpkgs-overlays/blob/master/nixpkgs/default.nix#L65) for `firefox-wayland-pipewire-unwrapped`, `firefox-wayland-pipewire`, `pipewire` and `xdg-desktop-portal` and `xdg-desktop-portal-wlr` from [nixpkgs-wayland](https://github.com/colemickens/nixpkgs-wayland)
+You need the [overlays](https://github.com/calbrecht/nixpkgs-overlays/blob/master/nixpkgs/default.nix#L65) for `firefox-wayland-pipewire-unwrapped`, `firefox-wayland-pipewire` and `pipewire`, also `xdg-desktop-portal-wlr` from [nixpkgs-wayland](https://github.com/colemickens/nixpkgs-wayland)
 
 in your /etc/configuration.nix
 
