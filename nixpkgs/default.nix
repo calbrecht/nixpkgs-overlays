@@ -70,7 +70,6 @@ in with pkgs;
 
   pipewire = import-overlay ./pkgs-overlays/pipewire;
 
-  xdg-desktop-portal = import-overlay ./pkgs-overlays/xdg-desktop-portal;
 
 } // {
   waylandPkgs = (pkgs.waylandPkgs or {}) // {
