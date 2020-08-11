@@ -65,7 +65,7 @@ in with pkgs;
   firefox-wayland-pipewire-unwrapped = import-overlay ./pkgs-overlays/firefox;
 
   firefox-wayland-pipewire = wrapFirefox self.firefox-wayland-pipewire-unwrapped {
-    gdkWayland = true;
+    useGlvnd = true;
   };
 
   pipewire = import-overlay ./pkgs-overlays/pipewire;
