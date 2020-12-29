@@ -1,6 +1,6 @@
 Firefox screensharing on sway and NixOs master
 
-# Since nixpkgs@master 2020-09-21
+# Since nixpkgs@master 2020-09-21 this overlay is obsolete for firefox screen casting capabilities under sway wayland
 
 When [NixOS/nixpkgs#84233](https://github.com/NixOS/nixpkgs/pull/84233) got merged into `nixpkgs master`, `firefox-wayland` pkg provides full support for casting the screen under `sway` `wayland` sessions.
 
