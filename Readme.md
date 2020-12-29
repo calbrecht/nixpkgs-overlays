@@ -25,7 +25,25 @@ Also it [turned out](https://github.com/NixOS/nixpkgs/pull/106815#issuecomment-7
 the following line into your `~/.config/sway/config`
 ```
 exec systemctl --user import-environment
+# and maybe also
+exec systemctl --user start graphical-session.target
 ```
+
+Also it seems to depend on [how sway is started and if xdg-desktop-portal is running as a user service](https://github.com/NixOS/nixpkgs/issues/101297#issuecomment-721482490).
+
+And it [does not like to run beside `gdm`](https://github.com/NixOS/nixpkgs/issues/93199#issuecomment-752249643)
+
+For me, it works because i do start `sway` after login on tty1 like so
+```
+{
+environment.interactiveShellInit = ''
+    if test `tty` = /dev/tty1; then
+       exec sway
+    fi
+  '';
+}
+```
+
 
 To verify your setup is working, try [mozilla gum_test](https://mozilla.github.io/webrtc-landing/gum_test.html).
 
