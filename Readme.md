@@ -1,5 +1,41 @@
 Firefox screensharing on sway and NixOs master
 
+# Since nixpkgs@master 2020-09-21
+
+When [NixOS/nixpkgs#84233](https://github.com/NixOS/nixpkgs/pull/84233) got merged into `nixpkgs master`, `firefox-wayland` pkg provides full support for casting the screen under `sway` `wayland` sessions.
+
+The required `configuration.nix` attrs are:
+```nix
+{
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr ];
+  xdg.portal.gtkUsePortal = true;
+
+  environment.sessionVariables = {
+     MOZ_ENABLE_WAYLAND = "1";
+     XDG_CURRENT_DESKTOP = "sway"; # https://github.com/emersion/xdg-desktop-portal-wlr/issues/20
+     XDG_SESSION_TYPE = "wayland"; # https://github.com/emersion/xdg-desktop-portal-wlr/pull/11
+  };
+  
+  services.pipewire.enable = true;
+}
+```
+
+Also it [turned out](https://github.com/NixOS/nixpkgs/pull/106815#issuecomment-751231083), you will need to put 
+the following line into your `~/.config/sway/config`
+```
+exec systemctl --user import-environment
+```
+
+To verify your setup is working, try [mozilla gum_test](https://mozilla.github.io/webrtc-landing/gum_test.html).
+
+For testing screen casting capability without the browser [xdp-screen-cast.py.sh](https://gist.github.com/calbrecht/7dea702094196f39356f1dfca457a2b4) `nix-shell python script` converted from [xdp-screen-cast.py](https://gitlab.gnome.org/snippets/19) found through [emersion/xdg-desktop-portal-wlr/wiki/Screencast-Compatibility](https://github.com/emersion/xdg-desktop-portal-wlr/wiki/Screencast-Compatibility) might be helpful as well.
+<br/>
+<br/>
+<br/>
+
+## Obsolete as of nixpkgs@master 2020-09-21
+
 You need the [overlays](https://github.com/calbrecht/nixpkgs-overlays/blob/master/nixpkgs/default.nix#L65) for `firefox-wayland-pipewire-unwrapped`, `firefox-wayland-pipewire` and `pipewire`, also `xdg-desktop-portal-wlr` from [nixpkgs-wayland](https://github.com/colemickens/nixpkgs-wayland)
 
 Please note: Everytime i reboot my system, i have to restart all the services using the sway shortcut mentioned below, else they are not started in correct order and fail.
