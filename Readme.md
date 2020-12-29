@@ -33,10 +33,10 @@ Also it seems to depend on [how sway is started and if xdg-desktop-portal is run
 
 And it [does not like to run beside `gdm`](https://github.com/NixOS/nixpkgs/issues/93199#issuecomment-752249643)
 
-For me, it works because i do start `sway` after login on tty1 like so
-```
+For me, it works because i do start `sway` after login on `tty1`, like so
+```nix
 {
-environment.interactiveShellInit = ''
+  environment.interactiveShellInit = ''
     if test `tty` = /dev/tty1; then
        exec sway
     fi
